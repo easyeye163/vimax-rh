@@ -1,0 +1,51 @@
+# ViMax-RH Configuration
+# Replaces Google/Doubao backends with RunningHub ComfyUI workflow APIs
+
+chat_model:
+  init_args:
+    model: google/gemini-2.5-flash-lite-preview-09-2025
+    model_provider: openai
+    api_key:
+    base_url: https://openrouter.ai/api/v1
+  # Rate limits for chat model API calls
+  max_requests_per_minute: 500
+  max_requests_per_day: 2000
+
+image_generator:
+  class_path: tools.ImageGeneratorRunningHub
+  init_args:
+    api_key:
+    # RunningHub workflow App IDs
+    t2i_app_id: "2088920592350277634"      # Text-to-Image workflow
+    i2i_app_id: "2088926295186034689"      # Image-to-Image (Kera2Edit) workflow
+    t2i_prompt_node_id: "17"               # nodeId for text-to-image prompt
+    t2i_prompt_field_name: "prompt"
+    i2i_prompt_node_id: "160"              # nodeId for image-to-image prompt
+    i2i_prompt_field_name: "text"
+    i2i_image_node_id: "104"               # nodeId for image-to-image reference
+    i2i_image_field_name: "image"
+    # Polling configuration
+    poll_interval: 10                        # seconds between status checks
+    poll_timeout: 300                       # max seconds to wait for result
+  # Rate limits for image generation
+  max_requests_per_minute: 10
+  max_requests_per_day: 500
+
+video_generator:
+  class_path: tools.VideoGeneratorRunningHub
+  init_args:
+    api_key:
+    # RunningHub workflow App ID
+    i2v_app_id: "2088844222551121921"       # Image-to-Video (AnimateDiff + MiniMax H3)
+    prompt_node_id: "138"                   # nodeId for video prompt
+    prompt_field_name: "value"
+    image_node_id: "137"                    # nodeId for reference image
+    image_field_name: "image"
+    # Polling configuration
+    poll_interval: 15                        # seconds between status checks (video takes longer)
+    poll_timeout: 600                       # max seconds to wait for result (~10 min)
+  # Rate limits for video generation
+  max_requests_per_minute: 2
+  max_requests_per_day: 20
+
+working_dir: .working_dir/idea2video
